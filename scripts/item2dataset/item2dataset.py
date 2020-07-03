@@ -134,14 +134,14 @@ def convert_bdc_item(collection, constants):
 
             feature['extent'] = OrderedDict()
             feature['extent']['coord'] = OrderedDict()
-            feature['extent']['coord']['ul'] = {'lat': f['geometry']['coordinates'][0][0][0],
-                                                'lon': f['geometry']['coordinates'][0][0][1]}
-            feature['extent']['coord']['ur'] = {'lat': f['geometry']['coordinates'][0][1][0],
-                                                'lon': f['geometry']['coordinates'][0][1][1]}
-            feature['extent']['coord']['lr'] = {'lat': f['geometry']['coordinates'][0][2][0],
-                                                'lon': f['geometry']['coordinates'][0][2][1]}
-            feature['extent']['coord']['ll'] = {'lat': f['geometry']['coordinates'][0][3][0],
-                                                'lon': f['geometry']['coordinates'][0][3][1]}
+            feature['extent']['coord']['ul'] = {'lon': f['geometry']['coordinates'][0][0][0],
+                                                'lat': f['geometry']['coordinates'][0][0][1]}
+            feature['extent']['coord']['ur'] = {'lon': f['geometry']['coordinates'][0][1][0],
+                                                'lat': f['geometry']['coordinates'][0][1][1]}
+            feature['extent']['coord']['lr'] = {'lon': f['geometry']['coordinates'][0][2][0],
+                                                'lat': f['geometry']['coordinates'][0][2][1]}
+            feature['extent']['coord']['ll'] = {'lon': f['geometry']['coordinates'][0][3][0],
+                                                'lat': f['geometry']['coordinates'][0][3][1]}
 
             ####
             feature['extent']['from_dt'] = datetime_str
