@@ -203,6 +203,9 @@ def convert_bdc_item(collection, constants):
 @click.option('-m', '--max_items', default=None, help='Max items')
 @click.option('-l', '--limit', default=100, help='Items per request')
 def main(collection, type, code, format, units, url, basepath, outpath, ignore, max_items, limit):
+    if max_items is not None:
+        max_items = int(max_items)
+
     constants = {
         'metadata_type': type,
         'plataform_code': code,
