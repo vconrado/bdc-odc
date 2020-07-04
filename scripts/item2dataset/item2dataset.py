@@ -214,7 +214,7 @@ def main(collection, type, code, format, units, url, basepath, outpath, ignore, 
         'basepath': basepath,
         'ignore': ignore,
         'outpath': outpath,
-        'max_items': int(max_items),
+        'max_items': max_items,
         'limit': limit
     }
     s = stac.STAC(url, True)
