@@ -107,9 +107,8 @@ def convert_bdc_item(collection, constants):
         if max_items is not None:
             if max_items == total_items:
                 break
-
-        if limit > (max_items-total_items):
-            limit = (max_items-total_items)
+            if limit > (max_items-total_items):
+                limit = (max_items-total_items)
 
         features = collection.get_items(
             filter={'page': page, 'limit': limit}).features
