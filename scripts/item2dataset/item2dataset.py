@@ -84,26 +84,25 @@ def convert_coords_xy(coords, in_spatial_ref, out_spatial_ref):
 
 def convert_bdc_item(collection, constants):
     crs_proj4 = collection['properties']['bdc:crs']
+    assert crs_proj4 is not None, "Invalid bdc:crs"
+
     sr = osr.SpatialReference()
     sr.ImportFromProj4(crs_proj4)
     crs_wkt = sr.ExportToWkt()
 
     out_spatial_ref = osr.SpatialReference()
-
     out_spatial_ref.ImportFromProj4(crs_proj4)
-
     in_spatial_ref = osr.SpatialReference()
     in_spatial_ref.ImportFromEPSG(4326)
 
     product_type = generate_product_type(collection)
 
-    limit = 120
     page = 1
-    max_page = 99999999
     total_items = 0
+    limit = constants['limit']
     max_items = constants['max_items']
 
-    for page in range(1, max_page+1):
+    while(True):
 
         if max_items is not None:
             if max_items == total_items:
@@ -119,9 +118,9 @@ def convert_bdc_item(collection, constants):
             break
 
         for f in features:
-            datetime_object = datetime.strptime(
-                f['properties']['datetime'], '%Y-%m-%d')
-            datetime_str = datetime_object.strftime("%Y-%m-%d %H:%M:%S.%fZ")
+
+            datetime_str = datetime.strptime(
+                f['properties']['datetime'], '%Y-%m-%d').strftime("%Y-%m-%d %H:%M:%S.%fZ")
 
             feature = OrderedDict()
             feature['id'] = generate_id(f)
@@ -202,7 +201,8 @@ def convert_bdc_item(collection, constants):
 @click.option('-o', '--outpath', default='./', help='Output path')
 @click.option('-i', '--ignore', default=['quality'], help='List of bands to ignore')
 @click.option('-m', '--max_items', default=None, help='Max items')
-def main(collection, type, code, format, units, url, basepath, outpath, ignore, max_items):
+@click.option('-l', '--limit', default=100, help='Items per request')
+def main(collection, type, code, format, units, url, basepath, outpath, ignore, max_items, limit):
     constants = {
         'metadata_type': type,
         'plataform_code': code,
@@ -211,7 +211,8 @@ def main(collection, type, code, format, units, url, basepath, outpath, ignore, 
         'basepath': basepath,
         'ignore': ignore,
         'outpath': outpath,
-        'max_items': int(max_items)
+        'max_items': int(max_items),
+        'limit': limit
     }
     s = stac.STAC(url, True)
     c = s.collection(collection)
