@@ -33,7 +33,7 @@ def cli():
 @click.option('--basepath', default='/gfs', help='Repository base path')
 @click.option('-o', '--outpath', default='./', help='Output path')
 @click.option('--ignore', default=['quality'], help='List of bands to ignore')
-@click.option('-m', '--max-items', default=None, help='Max items', required=True)
+@click.option('-m', '--max-items', default=None, help='Max items', required=False)
 @click.option('--pre-collection', default=False, is_flag=True,
               help="Defines whether the collection belongs to the pre-collection")
 @click.option('--verbose', default=False, is_flag=True, help='Enable verbose mode')
