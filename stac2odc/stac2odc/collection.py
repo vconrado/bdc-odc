@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     import stac2odc.item
     import stac2odc.collection
-    from stac2odc.mapper import Stac2ODCMapper08
+    from stac2odc.mapper import Stac2ODCMapper09
 
     constants = {
         'instrument_type': 'AWFI',
@@ -47,9 +47,10 @@ if __name__ == '__main__':
     }
     outfile = 'test.yaml'
 
-    s = stac.STAC('http://brazildatacube.dpi.inpe.br/bdc-stac/0.8.0/', True)
-    c = s.collection('CB4_64_16D_STK_v1')
-    yaml_content = stac2odc.collection.collection2product(c, Stac2ODCMapper08(), **constants)
+    s = stac.STAC('http://brazildatacube.dpi.inpe.br/stac/', False)
+    c = s.collection('CB4_64_16D_STK-1')
+    yaml_content = stac2odc.collection.collection2product(
+        c, Stac2ODCMapper09(), **constants)
     if outfile is None:
         print(yaml.dump(yaml_content))
     else:

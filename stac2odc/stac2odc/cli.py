@@ -29,7 +29,7 @@ def cli():
 @click.option('-p', '--code', help='Plataform code.', required=True)
 @click.option('-f', '--format', default='GeoTiff', help='Format name.')
 @click.option('--units', default='1', help='Units.')
-@click.option('--url', default='http://brazildatacube.dpi.inpe.br/bdc-stac/0.8.0/', help='BDC STAC url.')
+@click.option('--url', default='http://brazildatacube.dpi.inpe.br/stac/', help='BDC STAC url.')
 @click.option('--basepath', default='/gfs', help='Repository base path')
 @click.option('-o', '--outpath', default='./', help='Output path')
 @click.option('--ignore', default=['quality'], help='List of bands to ignore')
@@ -55,9 +55,9 @@ def item2dataset_cli(collection, instrument, code, format, units, url, basepath,
         "download": download,
         "download_out": download_out
     }
-    s = stac.STAC(url, True)
+    s = stac.STAC(url, False)
     c = s.collection(collection)
-    stac2odc.item.item2dataset(c, mapper.Stac2ODCMapper08(), **constants)
+    stac2odc.item.item2dataset(c, mapper.Stac2ODCMapper09(), **constants)
 
 
 @cli.command(name="collection2product", help="Function to convert a STAC Collection JSON to ODC Product YAML")
@@ -67,7 +67,7 @@ def item2dataset_cli(collection, instrument, code, format, units, url, basepath,
 @click.option('-p', '--code', help='Platform code.', required=True)
 @click.option('-f', '--format', default='GeoTiff', help='Format name')
 @click.option('--units', default='1', help='Units.')
-@click.option('--url', default='http://brazildatacube.dpi.inpe.br/bdc-stac/0.8.0/', help='BDC STAC url')
+@click.option('--url', default='http://brazildatacube.dpi.inpe.br/stac/', help='BDC STAC url')
 @click.option('-o', '--outfile', default=None, help='Output file')
 @click.option('--ignore', default=['quality'], help='List of bands to ignore', multiple=True)
 @click.option('--pre-collection', default=False, is_flag=True,
@@ -86,9 +86,10 @@ def collection2product_cli(collection, instrument, type, code, format, units, ur
         'verbose': verbose
     }
 
-    s = stac.STAC(url, True)
+    s = stac.STAC(url, False)
     c = s.collection(collection)
-    yaml_content = stac2odc.collection.collection2product(c, mapper.Stac2ODCMapper08(), **constants)
+    yaml_content = stac2odc.collection.collection2product(
+        c, mapper.Stac2ODCMapper09(), **constants)
     if outfile is None:
         print(yaml.dump(yaml_content))
     else:

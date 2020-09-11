@@ -73,23 +73,23 @@ if __name__ == '__main__':
 
     import stac2odc.item
     import stac2odc.collection
-    from stac2odc.mapper import Stac2ODCMapper08
+    from stac2odc.mapper import Stac2ODCMapper09
 
     constants = {
         'instrument_type': 'AWFI',
         'plataform_code': 'CBERS4',
         'format_name': 'GeoTIFF',
         'units': 'm',
-        'basepath': './',
+        'basepath': '/gfs',
         'ignore': ['quality'],
         'outpath': './',
         'max_items': 1,
         "is_pre_collection": False,
         'verbose': True,
-        "download": True,
+        "download": False,
         "download_out": './'
     }
 
-    s = stac.STAC('http://brazildatacube.dpi.inpe.br/bdc-stac/0.8.0/', True)
-    c = s.collection('CB4_64_16D_STK_v1')
-    item2dataset(c, Stac2ODCMapper08(), **constants)
+    s = stac.STAC('http://brazildatacube.dpi.inpe.br/stac/', False)
+    c = s.collection('CB4_64_16D_STK-1')
+    item2dataset(c, Stac2ODCMapper09(), **constants)

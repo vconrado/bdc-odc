@@ -17,7 +17,8 @@ tests_require = []
 
 extras_require = {
 }
-extras_require['all'] = [req for exts, reqs in extras_require.items() for req in reqs]
+extras_require['all'] = [req for exts, reqs in extras_require.items()
+                         for req in reqs]
 
 setup_requires = [
     'pytest-runner>=5.2',
@@ -26,7 +27,7 @@ setup_requires = [
 install_requires = [
     'tqdm==4.48.2',
     'loguru==0.5.1',
-    'gdal==2.4.0',
+    # 'gdal==2.4.0',
     'requests==2.22.0',
     'jsonschema==3.2.0',
     'pyyaml>=5.3.1',

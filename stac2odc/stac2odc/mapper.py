@@ -11,6 +11,7 @@ from abc import ABC, abstractmethod
 from loguru import logger
 import stac2odc.utils as utils
 from collections import OrderedDict
+from osgeo import osr
 
 
 class Stac2ODCMapper(ABC):
@@ -64,8 +65,10 @@ class Stac2ODCMapper08(Stac2ODCMapper):
 
         odc_config['metadata'] = OrderedDict()
         odc_config['metadata']['platform'] = {'code': kwargs['platform_code']}
-        odc_config['metadata']['instrument'] = {'name': kwargs['instrument_type']}
-        odc_config['metadata']['product_type'] = self.generate_product_type(collection)
+        odc_config['metadata']['instrument'] = {
+            'name': kwargs['instrument_type']}
+        odc_config['metadata']['product_type'] = self.generate_product_type(
+            collection)
         odc_config['metadata']['format'] = {'name': kwargs['format_name']}
         odc_config['measurements'] = [measurements(k, v)
                                       for k, v in collection['properties']['bdc:bands'].items() if
@@ -101,7 +104,8 @@ class Stac2ODCMapper08(Stac2ODCMapper):
 
             feature = OrderedDict()
             feature['id'] = _featureid
-            feature['creation_dt'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%fZ")
+            feature['creation_dt'] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S.%fZ")
             feature['product_type'] = self.generate_product_type(collection)
             feature['platform'] = {'code': kwargs['plataform_code']}
             feature['instrument'] = {'name': kwargs['instrument_type']}
@@ -140,7 +144,8 @@ class Stac2ODCMapper08(Stac2ODCMapper):
             feature['grid_spatial']['projection']['geo_ref_points']['ll'] = {
                 'x': ulx, 'y': lry}
 
-            feature['grid_spatial']['projection']['spatial_reference'] = utils.to_wkt(crs_proj4)
+            feature['grid_spatial']['projection']['spatial_reference'] = utils.to_wkt(
+                crs_proj4)
             feature['image'] = OrderedDict()
             feature['image']['bands'] = OrderedDict()
             band_counter = 1
@@ -181,7 +186,7 @@ class Stac2ODCMapper09(Stac2ODCMapper):
             logger.info("collection2product is running!")
 
         crs_proj4 = collection['cube:dimensions']['x']['reference_system']
-        if kwargs['is_pre_collection']: # fix gdal3 proj4 pattern error
+        if kwargs['is_pre_collection']:  # fix gdal3 proj4 pattern error
             crs_proj4 = utils.fix_precollection_crs(crs_proj4)
 
         odc_config = OrderedDict()
@@ -192,14 +197,18 @@ class Stac2ODCMapper09(Stac2ODCMapper):
         odc_config['storage'] = OrderedDict()
         odc_config['storage']['crs'] = crs_proj4
         odc_config['storage']['resolution'] = OrderedDict()
-        odc_config['storage']['resolution']['x'] = int(collection['properties']['eo:gsd'])
-        odc_config['storage']['resolution']['y'] = int(collection['properties']['eo:gsd']) * -1
+        odc_config['storage']['resolution']['x'] = int(
+            collection['properties']['eo:gsd'])
+        odc_config['storage']['resolution']['y'] = int(
+            collection['properties']['eo:gsd']) * -1
 
         # Generate platform infos
         odc_config['metadata'] = OrderedDict()
         odc_config['metadata']['platform'] = {'code': kwargs['platform_code']}
-        odc_config['metadata']['instrument'] = {'name': kwargs['instrument_type']}
-        odc_config['metadata']['product_type'] = self.generate_product_type(collection)
+        odc_config['metadata']['instrument'] = {
+            'name': kwargs['instrument_type']}
+        odc_config['metadata']['product_type'] = self.generate_product_type(
+            collection)
         odc_config['metadata']['format'] = {'name': kwargs['format_name']}
         odc_config['measurements'] = [measurements(v)
                                       for v in collection['properties']['eo:bands'] if
@@ -234,7 +243,8 @@ class Stac2ODCMapper09(Stac2ODCMapper):
 
             feature = OrderedDict()
             feature['id'] = _featureid
-            feature['creation_dt'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%fZ")
+            feature['creation_dt'] = datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S.%fZ")
             feature['product_type'] = self.generate_product_type(collection)
             feature['platform'] = {'code': kwargs['plataform_code']}
             feature['instrument'] = {'name': kwargs['instrument_type']}
@@ -243,9 +253,10 @@ class Stac2ODCMapper09(Stac2ODCMapper):
 
             feature['extent'] = OrderedDict()
             feature['extent']['coord'] = OrderedDict()
-            feature['extent']['coord'] = utils.geometry_coordinates(f)
+            # Using extent.coord from file metadata because BDC-STAC is updating this data
+            # feature['extent']['coord'] = utils.geometry_coordinates(f)
             feature['extent']['from_dt'] = _startdate
-            feature['extent']['center_dt'] = _startdate # ToDo: Verify this
+            feature['extent']['center_dt'] = _startdate  # ToDo: Verify this
             feature['extent']['to_dt'] = _enddate
 
             # verify if necessary download data
@@ -255,7 +266,8 @@ class Stac2ODCMapper09(Stac2ODCMapper):
                 kwargs['basepath'] = kwargs['download_out']
 
             # Extract image bbox
-            first_band = next(iter(collection['properties']['eo:bands']))
+            first_band = next(
+                iter(collection['properties']['eo:bands']))['name']
             first_band_path = utils.href_to_path(
                 f['assets'][first_band]['href'], kwargs['basepath'])
 
@@ -273,11 +285,25 @@ class Stac2ODCMapper09(Stac2ODCMapper):
             feature['grid_spatial']['projection']['geo_ref_points']['ll'] = {
                 'x': ulx, 'y': lry}
 
-            feature['grid_spatial']['projection']['spatial_reference'] = utils.to_wkt(crs_proj4)
+            feature['grid_spatial']['projection']['spatial_reference'] = utils.to_wkt(
+                crs_proj4)
+
+            # Temporary convertion. Remove after BDC-STAC coordinates update
+            # Converting grid to EPSG:4326
+            in_spatial_ref = osr.SpatialReference()
+            in_spatial_ref.ImportFromProj4(crs_proj4)
+            out_spatial_ref = osr.SpatialReference()
+            out_spatial_ref.ImportFromEPSG(4326)
+
+            feature['extent']['coord'] = utils.convert_coords_xy(
+                feature['grid_spatial']['projection']['geo_ref_points'], in_spatial_ref, out_spatial_ref)
+
             feature['image'] = OrderedDict()
             feature['image']['bands'] = OrderedDict()
             band_counter = 1
-            for band in collection['properties']['eo:bands'].keys():
+            bands = [b['name']
+                     for b in collection['properties']['eo:bands']]
+            for band in bands:
                 if band not in kwargs['ignore']:
                     if band in f['assets']:
                         feature['image']['bands'][band] = OrderedDict()

@@ -53,18 +53,26 @@ def convert_coords(coords, in_spatial_ref, out_spatial_ref):
 
 
 def convert_coords_xy(coords, in_spatial_ref, out_spatial_ref):
+
+    if int(osgeo.__version__[0]) >= 3:
+        # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
+        in_spatial_ref.SetAxisMappingStrategy(
+            osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
+        out_spatial_ref.SetAxisMappingStrategy(
+            osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
+
     t = osr.CoordinateTransformation(in_spatial_ref, out_spatial_ref)
 
     def transform(p):
         a = t.TransformPoint(p['x'], p['y'])
-        return {'x': a[0], 'y': a[1]}
+        return {'lon': a[0], 'lat': a[1]}
 
     return {key: transform(p) for key, p in coords.items()}
 
 
 def stacdate_to_odcdate(datepattern):
     """Function to transform stac date pattern to ODC pattern
-    
+
     Args:
         datepattern (str): A String pattern with date (e. g. CB4_64_16D_STK_v1_020024_2020-07-11_2020-07-26)
     Returns:
@@ -125,20 +133,20 @@ def geometry_coordinates(feature):
     """
 
     return {
-                'ul': {
-                    'lon': feature['geometry']['coordinates'][0][0][0],
-                    'lat': feature['geometry']['coordinates'][0][0][1]
-                },
-                'ur': {
-                    'lon': feature['geometry']['coordinates'][0][1][0],
-                    'lat': feature['geometry']['coordinates'][0][1][1]
-                },
-                'lr': {
-                    'lon': feature['geometry']['coordinates'][0][2][0],
-                    'lat': feature['geometry']['coordinates'][0][2][1]
-                },
-                'll': {
-                    'lon': feature['geometry']['coordinates'][0][3][0],
-                    'lat': feature['geometry']['coordinates'][0][3][1]
-                }
-            }
+        'ul': {
+            'lon': feature['geometry']['coordinates'][0][0][0],
+            'lat': feature['geometry']['coordinates'][0][0][1]
+        },
+        'ur': {
+            'lon': feature['geometry']['coordinates'][0][1][0],
+            'lat': feature['geometry']['coordinates'][0][1][1]
+        },
+        'lr': {
+            'lon': feature['geometry']['coordinates'][0][2][0],
+            'lat': feature['geometry']['coordinates'][0][2][1]
+        },
+        'll': {
+            'lon': feature['geometry']['coordinates'][0][3][0],
+            'lat': feature['geometry']['coordinates'][0][3][1]
+        }
+    }
