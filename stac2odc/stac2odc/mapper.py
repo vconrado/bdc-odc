@@ -175,7 +175,7 @@ class Stac2ODCMapper09(Stac2ODCMapper):
     def map_collection(self, collection, **kwargs) -> OrderedDict:
         def measurements(data):
             m = OrderedDict()
-            m['name'] = data['name'].replace("-", "_")
+            m['name'] = data['name']
             m['aliases'] = [data['name'], ]
             m['dtype'] = data['data_type'].lower()
             m['nodata'] = data['nodata']
@@ -190,7 +190,7 @@ class Stac2ODCMapper09(Stac2ODCMapper):
             crs_proj4 = utils.fix_precollection_crs(crs_proj4)
 
         odc_config = OrderedDict()
-        odc_config['name'] = collection['id']
+        odc_config['name'] = collection['id'].replace("-", "_")
         odc_config['description'] = collection['description']
         odc_config['metadata_type'] = kwargs['metadata_type']
 
