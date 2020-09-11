@@ -41,6 +41,10 @@ def cli():
 @click.option('--download-out', default="./", help="Path to download dir")
 def item2dataset_cli(collection, instrument, code, format, units, url, basepath, outpath, ignore, max_items,
                      pre_collection, verbose, download, download_out):
+
+    if max_items is not None:
+        max_items = int(max_items)
+
     constants = {
         'instrument_type': instrument,
         'plataform_code': code,
@@ -49,7 +53,7 @@ def item2dataset_cli(collection, instrument, code, format, units, url, basepath,
         'basepath': basepath,
         'ignore': ignore,
         'outpath': outpath,
-        'max_items': int(max_items),
+        'max_items': max_items,
         "is_pre_collection": pre_collection,
         'verbose': verbose,
         "download": download,
