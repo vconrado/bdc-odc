@@ -14,6 +14,7 @@ from stac.collection import Collection
 from stac2odc.mapper import Stac2ODCMapper
 
 STAC_MAX_PAGE = 99999999
+STAC_MAX_ITEMS = 99999999
 STAC_ITEM_PER_PAGE = 120
 
 
@@ -35,6 +36,8 @@ def item2dataset(collection: Collection, mapper: Stac2ODCMapper, **kwargs) -> No
     total_items = 0
     limit = STAC_ITEM_PER_PAGE
     max_items = kwargs['max_items']
+    if max_items is None:
+        max_items = STAC_MAX_ITEMS
 
     if kwargs['verbose']:
         logger.info("Collecting information from STAC...")
