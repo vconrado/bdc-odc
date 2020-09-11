@@ -176,7 +176,7 @@ class Stac2ODCMapper09(Stac2ODCMapper):
         def measurements(data):
             m = OrderedDict()
             m['name'] = data['name']
-            m['aliases'] = [data['name'], ]
+            m['aliases'] = [data['common_name'], ]
             m['dtype'] = data['data_type'].lower()
             m['nodata'] = data['nodata']
             m['units'] = kwargs['units']
